@@ -1,7 +1,7 @@
 {
   "name": "aibrain",
   "version": "0.1.0",
-  "description": "Repo Scanned -> Inspector Gadget",
+  "description": "A local-first CLI tool that scans your git repository to generate a schema-first 'Repo Brain' for humans and agents.",
   "main": "dist/index.js",
   "bin": {
     "aibrain": "./dist/cli/index.js"
@@ -14,9 +14,14 @@
   "keywords": [
     "cli",
     "analysis",
-    "structure"
+    "structure",
+    "documentation",
+    "agent",
+    "code-analysis",
+    "architecture",
+    "linter"
   ],
-  "author": "",
+  "author": "Vojtech Horak",
   "license": "ISC",
   "dependencies": {
     "commander": "^13.0.0",

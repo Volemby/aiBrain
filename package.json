@@ -1,13 +1,19 @@
 {
   "name": "aibrain",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A local-first CLI tool that scans your git repository to generate a schema-first 'Repo Brain' for humans and agents.",
   "main": "dist/index.js",
   "bin": {
     "aibrain": "./dist/cli/index.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
+    "prepare": "npm run build",
     "test": "vitest",
     "lint": "eslint src",
     "docs:dev": "vitepress dev docs",

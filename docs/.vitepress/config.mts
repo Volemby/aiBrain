@@ -6,6 +6,7 @@ export default defineConfig({
     description: "Repo Scanned -> Inspector Gadget",
     appearance: 'dark', // Force dark mode for that "slick" look
     cleanUrls: true,
+    base: '/aiBrain/',
 
     themeConfig: {
         // https://vitepress.dev/reference/default-theme-config

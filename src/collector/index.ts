@@ -35,9 +35,11 @@ export async function collect(root: string, config: Config): Promise<RepoSnapsho
         // ignore missing file
     }
 
-    // default ignores if not present
-    if (!ignores.includes('node_modules/**')) ignores.push('node_modules/**');
-    if (!ignores.includes('.git/**')) ignores.push('.git/**');
+    // Default Ignores (Phase 2 Requirement)
+    const defaults = ['node_modules/**', '.git/**', 'dist/**', '.next/**', 'coverage/**', '.venv/**'];
+    defaults.forEach(d => {
+        if (!ignores.includes(d)) ignores.push(d);
+    });
 
     // 2. Scan files
     const entries = await fg(config.include, {
@@ -45,13 +47,50 @@ export async function collect(root: string, config: Config): Promise<RepoSnapsho
         ignore: ignores,
         dot: true,
         stats: true,
-        absolute: true
+        absolute: true,
+        onlyFiles: true
     });
 
-    const files: FileEntry[] = entries.map((entry: any) => ({
-        path: path.relative(root, entry.path), // store relative paths
-        size: entry.stats?.size || 0
-    }));
+    // Filter by allowed extensions (Phase 2 Requirement)
+    // .ts, .tsx, .js, .jsx, .py
+    const ALLOWED_EXTS = ['.ts', '.tsx', '.js', '.jsx', '.py'];
+
+    let processedEntries = entries.filter((entry: any) => {
+        const ext = path.extname(entry.path);
+        return ALLOWED_EXTS.includes(ext);
+    });
+
+    // Deterministic Sort (Phase 2 Requirement)
+    // Sort alphabetically by relative path
+    processedEntries.sort((a: any, b: any) => {
+        const pathA = path.relative(root, a.path);
+        const pathB = path.relative(root, b.path);
+        return pathA.localeCompare(pathB);
+    });
+
+    // Enforce Max File Size (Phase 2 Requirement)
+    // We already have stats. Skip filtered out files.
+    const maxBytes = (config.max_file_kb || 512) * 1024;
+
+    const files: FileEntry[] = [];
+
+    for (const entry of processedEntries) {
+        const stats = (entry as any).stats;
+        if (stats.size > maxBytes) {
+            // TODO: In a real world scenario, we might want to log this to Status
+            // For now we just silently skip or maybe valid to log to stderr in verbose mode
+            continue;
+        }
+
+        files.push({
+            path: path.relative(root, (entry as any).path),
+            size: stats.size
+        });
+
+        if (files.length >= (config.max_files || 20000)) {
+            break;
+        }
+    }
 
     // 3. Create snapshot
     const snapshot: RepoSnapshot = {

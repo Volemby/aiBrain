@@ -49,6 +49,7 @@ export interface ProjectStructure {
 export interface ImportNode {
     path: string; // normalized file path or module name
     imports: string[]; // paths it imports
+    specifiers?: string[]; // raw import strings for evidence/violations
 }
 
 export interface ImportGraph {
@@ -79,6 +80,8 @@ export interface Convention {
     conv_id: string;
     description: string;
     confidence: 'HIGH' | 'MED' | 'LOW' | 'CONFLICT';
+    score: number; // 0.0 to 1.0
+    evidence_count: number;
     examples: string[]; // evidence IDs
 }
 
